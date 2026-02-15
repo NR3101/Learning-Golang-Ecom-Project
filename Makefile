@@ -1,4 +1,4 @@
-.PHONY: help build run dev lint migrate-up migrate-down docker-up docker-down
+.PHONY: help build run dev lint format migrate-up migrate-down docker-up docker-down
 
 help:
 	@echo "Makefile commands:"
@@ -6,10 +6,12 @@ help:
 	@echo "  run            - Run the application"
 	@echo "  dev            - Run the application in development mode"
 	@echo "  lint           - Run linters on the codebase"
+	@echo "  format         - Format the codebase using gofmt and goimports"
 	@echo "  migrate-up     - Apply database migrations"
 	@echo "  migrate-down   - Rollback database migrations"
-	@echo "  docker-up      - Start the application using Docker"
-	@echo "  docker-down    - Stop the application using Docker"
+	@echo "  docker-up      - Start the application dependency services using Docker"
+	@echo "  docker-down    - Stop the application dependency services using Docker"
+
 
 build:
 	go build -o bin/app ./cmd/api
@@ -20,8 +22,12 @@ run:
 dev:
 	go run ./cmd/api
 
-lint:
+lint: format
 	golangci-lint run ./...
+
+format:
+	@gofmt -s -w .
+	@goimports -w .
 
 migrate-up:
 	migrate -path db/migrations -database "postgres://postgres:password@localhost:5432/ecomdb?sslmode=disable" up
