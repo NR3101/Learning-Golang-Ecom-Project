@@ -1,7 +1,30 @@
 package main
 
-import "fmt"
+import (
+	"github.com/NR3101/go-ecom-project/internal/config"
+	"github.com/NR3101/go-ecom-project/internal/database"
+	"github.com/NR3101/go-ecom-project/internal/logger"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	logger := logger.New()
+	cfg, err := config.Load()
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to load configuration")
+	}
+
+	db, err := database.New(cfg.Database)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to connect to database")
+	}
+
+	mainDB, err := db.DB()
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to get database instance")
+	}
+	defer mainDB.Close()
+
+	gin.SetMode(cfg.Server.GinMode)
+	logger.Info().Msg("Starting API server")
 }
