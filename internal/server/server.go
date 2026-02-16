@@ -10,14 +10,14 @@ import (
 )
 
 type Server struct {
-	conf   *config.Config
+	config *config.Config
 	db     *gorm.DB
 	logger *zerolog.Logger
 }
 
 func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger) *Server {
 	return &Server{
-		conf:   cfg,
+		config: cfg,
 		db:     db,
 		logger: logger,
 	}
