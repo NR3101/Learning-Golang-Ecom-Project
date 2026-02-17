@@ -114,8 +114,12 @@ func (s *AuthService) RefreshToken(req *dto.RefreshTokenRequest) (*dto.AuthRespo
 // Logout invalidates the provided refresh token by deleting it from the database.
 func (s *AuthService) Logout(refreshToken string) error {
 	// Delete refresh token from DB
-	if err := s.db.Where("token = ?", refreshToken).Delete(&models.RefreshToken{}).Error; err != nil {
-		return err
+	result := s.db.Where("token = ?", refreshToken).Delete(&models.RefreshToken{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("refresh token not found or already logged out")
 	}
 	return nil
 }
