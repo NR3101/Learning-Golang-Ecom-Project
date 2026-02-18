@@ -1,6 +1,6 @@
 ### Get authenticated user's profile
 GET http://localhost:8080/api/v1/users/profile
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJlbWFpbCI6InJhbUAxMjMuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwiZXhwIjoxNzcxNTA4NDQyLCJpYXQiOjE3NzE0MjIwNDJ9.qY1IrHZTPEk1rnwsawqYHNBlP917_Mp-r478cH3nhQA
+Authorization: Bearer <token>
 
 

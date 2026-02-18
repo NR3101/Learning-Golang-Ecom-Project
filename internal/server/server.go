@@ -46,16 +46,38 @@ func (s *Server) SetupRoutes() *gin.Engine {
 			auth.POST("/logout", s.logout)
 		}
 
-		// User routes (protected)
+		// Protected routes
 		protected := api.Group("/")
 		protected.Use(s.authMiddleware())
 		{
+			// User routes
 			users := protected.Group("/users")
 			{
 				users.GET("/profile", s.getProfile)
 				users.PUT("/profile", s.updateProfile)
 			}
+
+			// Category routes
+			categories := protected.Group("/categories")
+			{
+				categories.POST("/", s.adminMiddleware(), s.createCategory)
+				categories.PUT("/:id", s.adminMiddleware(), s.updateCategory)
+				categories.DELETE("/:id", s.adminMiddleware(), s.deleteCategory)
+			}
+
+			// Product routes
+			products := protected.Group("/products")
+			{
+				products.POST("/", s.adminMiddleware(), s.createProduct)
+				products.PUT("/:id", s.adminMiddleware(), s.updateProduct)
+				products.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
+			}
 		}
+
+		// Public routes
+		api.GET("/categories", s.getCategories)
+		api.GET("/products", s.getProducts)
+		api.GET("/products/:id", s.getProductByID)
 	}
 
 	return router

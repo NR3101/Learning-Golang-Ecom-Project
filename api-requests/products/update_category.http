@@ -1,0 +1,12 @@
+### Update a category (Admin only)
+PUT http://localhost:8080/api/v1/categories/1
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "name": "Electronics & Gadgets",
+  "description": "Updated description for electronics",
+  "is_active": true
+}
+
+

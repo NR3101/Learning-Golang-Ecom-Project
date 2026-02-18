@@ -1,0 +1,11 @@
+### Create a new category (Admin only)
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "name": "Electronics",
+  "description": "Electronic devices and gadgets"
+}
+
+

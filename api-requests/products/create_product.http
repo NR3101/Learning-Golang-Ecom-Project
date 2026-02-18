@@ -1,0 +1,15 @@
+### Create a new product (Admin only)
+POST http://localhost:8080/api/v1/products
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "category_id": 1,
+  "name": "iPhone 15 Pro",
+  "description": "Latest Apple smartphone with A17 Pro chip",
+  "price": 999.99,
+  "stock": 100,
+  "sku": "IPHONE-15-PRO-001"
+}
+
+
