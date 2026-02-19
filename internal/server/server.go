@@ -4,22 +4,35 @@ import (
 	"net/http"
 
 	"github.com/NR3101/go-ecom-project/internal/config"
+	"github.com/NR3101/go-ecom-project/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
 )
 
 type Server struct {
-	config *config.Config
-	db     *gorm.DB
-	logger *zerolog.Logger
+	config         *config.Config
+	db             *gorm.DB
+	logger         *zerolog.Logger
+	authService    *services.AuthService
+	productService *services.ProductService
+	userService    *services.UserService
 }
 
-func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger) *Server {
+func New(cfg *config.Config,
+	db *gorm.DB,
+	logger *zerolog.Logger,
+	authService *services.AuthService,
+	productService *services.ProductService,
+	userService *services.UserService,
+) *Server {
 	return &Server{
-		config: cfg,
-		db:     db,
-		logger: logger,
+		config:         cfg,
+		db:             db,
+		logger:         logger,
+		authService:    authService,
+		productService: productService,
+		userService:    userService,
 	}
 }
 
@@ -60,7 +73,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 			// Category routes
 			categories := protected.Group("/categories")
 			{
-				categories.POST("/", s.adminMiddleware(), s.createCategory)
+				categories.POST("", s.adminMiddleware(), s.createCategory)
 				categories.PUT("/:id", s.adminMiddleware(), s.updateCategory)
 				categories.DELETE("/:id", s.adminMiddleware(), s.deleteCategory)
 			}
@@ -68,7 +81,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 			// Product routes
 			products := protected.Group("/products")
 			{
-				products.POST("/", s.adminMiddleware(), s.createProduct)
+				products.POST("", s.adminMiddleware(), s.createProduct)
 				products.PUT("/:id", s.adminMiddleware(), s.updateProduct)
 				products.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
 			}

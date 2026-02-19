@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/NR3101/go-ecom-project/internal/dto"
-	"github.com/NR3101/go-ecom-project/internal/services"
 	"github.com/NR3101/go-ecom-project/internal/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -15,8 +14,7 @@ func (s *Server) register(c *gin.Context) {
 		return
 	}
 
-	authService := services.NewAuthService(s.db, s.config)
-	response, err := authService.Register(&req)
+	response, err := s.authService.Register(&req)
 	if err != nil {
 		utils.InternalServerErrorResponse(c, "Failed to register user", err)
 		return
@@ -33,8 +31,7 @@ func (s *Server) login(c *gin.Context) {
 		return
 	}
 
-	authService := services.NewAuthService(s.db, s.config)
-	response, err := authService.Login(&req)
+	response, err := s.authService.Login(&req)
 	if err != nil {
 		utils.UnauthorizedResponse(c, "Invalid email or password")
 		return
@@ -51,8 +48,7 @@ func (s *Server) refreshToken(c *gin.Context) {
 		return
 	}
 
-	authService := services.NewAuthService(s.db, s.config)
-	response, err := authService.RefreshToken(&req)
+	response, err := s.authService.RefreshToken(&req)
 	if err != nil {
 		utils.UnauthorizedResponse(c, "Invalid refresh token")
 		return
@@ -69,8 +65,7 @@ func (s *Server) logout(c *gin.Context) {
 		return
 	}
 
-	authService := services.NewAuthService(s.db, s.config)
-	err := authService.Logout(req.RefreshToken)
+	err := s.authService.Logout(req.RefreshToken)
 	if err != nil {
 		utils.InternalServerErrorResponse(c, "Failed to logout user", err)
 		return

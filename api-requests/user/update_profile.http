@@ -1,7 +1,7 @@
 ### Update authenticated user's profile
-PUT http://localhost:8080/api/v1/users/profile
+PUT {{base_url}}/users/profile
 Content-Type: application/json
-Authorization: Bearer <token>
+Authorization: Bearer {{access_token}}
 
 {
   "first_name": "Ram",

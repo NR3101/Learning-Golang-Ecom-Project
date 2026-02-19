@@ -1,8 +1,8 @@
 ### Logout user
-POST http://localhost:8080/api/v1/auth/logout
+POST {{base_url}}/auth/logout
 Content-Type: application/json
 
 {
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJlbWFpbCI6InJhbUAxMjMuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwiZXhwIjoxNzcxOTUxNDA2LCJpYXQiOjE3NzEzNDY2MDZ9.9Bgi4anwcw9Y-CBmdOFd84vYziHvT-A8AhakjT8toIY"
+  "refresh_token": {{refresh_token}}
 }
 

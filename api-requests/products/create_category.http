@@ -1,7 +1,7 @@
 ### Create a new category (Admin only)
-POST http://localhost:8080/api/v1/categories
+POST {{base_url}}/categories
 Content-Type: application/json
-Authorization: Bearer <token>
+Authorization: Bearer {{access_token}}
 
 {
   "name": "Electronics",

@@ -14,6 +14,7 @@ import (
 	"github.com/NR3101/go-ecom-project/internal/database"
 	"github.com/NR3101/go-ecom-project/internal/logger"
 	"github.com/NR3101/go-ecom-project/internal/server"
+	"github.com/NR3101/go-ecom-project/internal/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,7 +38,11 @@ func main() {
 
 	gin.SetMode(cfg.Server.GinMode)
 
-	srv := server.New(cfg, db, &log)
+	authService := services.NewAuthService(db, cfg)
+	productService := services.NewProductService(db)
+	userService := services.NewUserService(db)
+
+	srv := server.New(cfg, db, &log, authService, productService, userService)
 	router := srv.SetupRoutes()
 
 	httpServer := &http.Server{

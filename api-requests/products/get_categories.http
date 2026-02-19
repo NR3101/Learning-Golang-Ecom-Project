@@ -1,5 +1,5 @@
 ### Get all categories (Public)
-GET http://localhost:8080/api/v1/categories
+GET {{base_url}}/categories
 Content-Type: application/json
 
 

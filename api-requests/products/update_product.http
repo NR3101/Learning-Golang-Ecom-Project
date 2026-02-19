@@ -1,10 +1,10 @@
 ### Update a product (Admin only)
-PUT http://localhost:8080/api/v1/products/1
+PUT {{base_url}}/products/5
 Content-Type: application/json
-Authorization: Bearer <token>
+Authorization: Bearer {{access_token}}
 
 {
-  "category_id": 1,
+  "category_id": 4,
   "name": "iPhone 15 Pro Max",
   "description": "Updated description for iPhone 15 Pro Max",
   "price": 1199.99,
