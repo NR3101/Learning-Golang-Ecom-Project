@@ -45,8 +45,9 @@ type AwsConfig struct {
 }
 
 type UploadConfig struct {
-	Path        string
-	MaxFileSize int64
+	Path           string
+	MaxFileSize    int64
+	UploadProvider string
 }
 
 func Load() (*Config, error) {
@@ -84,8 +85,9 @@ func Load() (*Config, error) {
 			S3Endpoint:      getEnv("AWS_S3_ENDPOINT", "http://localhost:9000"), // For local testing
 		},
 		Upload: UploadConfig{
-			Path:        getEnv("UPLOAD_PATH", "./uploads"),
-			MaxFileSize: maxUploadSize, // 10 MB
+			Path:           getEnv("UPLOAD_PATH", "./uploads"),
+			MaxFileSize:    maxUploadSize,                      // 10 MB
+			UploadProvider: getEnv("UPLOAD_PROVIDER", "local"), // "local" or "s3"
 		},
 	}
 	return config, nil

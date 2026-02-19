@@ -12,6 +12,7 @@ import (
 
 	"github.com/NR3101/go-ecom-project/internal/config"
 	"github.com/NR3101/go-ecom-project/internal/database"
+	"github.com/NR3101/go-ecom-project/internal/interfaces"
 	"github.com/NR3101/go-ecom-project/internal/logger"
 	"github.com/NR3101/go-ecom-project/internal/providers"
 	"github.com/NR3101/go-ecom-project/internal/server"
@@ -42,7 +43,18 @@ func main() {
 	authService := services.NewAuthService(db, cfg)
 	productService := services.NewProductService(db)
 	userService := services.NewUserService(db)
-	uploadService := services.NewUploadService(providers.NewLocalUploadProvider(cfg.Upload.Path))
+
+	var uploadProvider interfaces.UploadProvider
+	if cfg.Upload.UploadProvider == "s3" {
+		uploadProvider, err = providers.NewS3Provider(cfg)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to initialize S3 upload provider")
+		}
+	} else {
+		uploadProvider = providers.NewLocalUploadProvider(cfg.Upload.Path)
+	}
+
+	uploadService := services.NewUploadService(uploadProvider)
 
 	srv := server.New(cfg, db, &log, authService, productService, userService, uploadService)
 	router := srv.SetupRoutes()
