@@ -190,6 +190,23 @@ func (s *ProductService) DeleteProduct(id uint) error {
 	return nil
 }
 
+// AddProductImage adds a new image to a product. If it's the first image for the product, it will be set as the primary image.
+func (s *ProductService) AddProductImage(productId uint, imageUrl, altText string) error {
+	var count int64
+	if err := s.db.Model(&models.ProductImage{}).Where("product_id = ?", productId).Count(&count).Error; err != nil {
+		return err
+	}
+
+	image := &models.ProductImage{
+		ProductID: productId,
+		URL:       imageUrl,
+		AltText:   altText,
+		IsPrimary: count == 0, // Set as primary if it's the first image
+	}
+
+	return s.db.Create(&image).Error
+}
+
 // convertToProductResponse is a helper method that converts a Product model to a ProductResponse DTO, including its category and images.
 func (s *ProductService) convertToProductResponse(product *models.Product) dto.ProductResponse {
 	images := make([]dto.ProductImageResponse, len(product.Images))

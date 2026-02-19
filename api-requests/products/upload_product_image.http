@@ -1,0 +1,13 @@
+### Upload product image (Admin only)
+POST {{base_url}}/products/1/images
+Authorization: Bearer {{access_token}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="product.png"
+Content-Type: image/png
+
+< /path/to/your/image.png
+--WebAppBoundary--
+
+

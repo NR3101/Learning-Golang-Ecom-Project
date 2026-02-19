@@ -17,6 +17,7 @@ type Server struct {
 	authService    *services.AuthService
 	productService *services.ProductService
 	userService    *services.UserService
+	uploadService  *services.UploadService
 }
 
 func New(cfg *config.Config,
@@ -25,6 +26,7 @@ func New(cfg *config.Config,
 	authService *services.AuthService,
 	productService *services.ProductService,
 	userService *services.UserService,
+	uploadService *services.UploadService,
 ) *Server {
 	return &Server{
 		config:         cfg,
@@ -33,6 +35,7 @@ func New(cfg *config.Config,
 		authService:    authService,
 		productService: productService,
 		userService:    userService,
+		uploadService:  uploadService,
 	}
 }
 
@@ -46,6 +49,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 
 	// API routes
 	router.GET("/health", s.healthCheckHandler)
+	router.Static("/uploads", "./uploads")
 
 	// Group API routes under /api/v1
 	api := router.Group("/api/v1")
@@ -84,6 +88,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 				products.POST("", s.adminMiddleware(), s.createProduct)
 				products.PUT("/:id", s.adminMiddleware(), s.updateProduct)
 				products.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
+				products.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
 			}
 		}
 
