@@ -1,0 +1,4 @@
+### Remove item from cart
+DELETE {{base_url}}/cart/items/1
+Authorization: Bearer {{access_token}}
+

@@ -18,6 +18,7 @@ type Server struct {
 	productService *services.ProductService
 	userService    *services.UserService
 	uploadService  *services.UploadService
+	cartService    *services.CartService
 }
 
 func New(cfg *config.Config,
@@ -27,6 +28,7 @@ func New(cfg *config.Config,
 	productService *services.ProductService,
 	userService *services.UserService,
 	uploadService *services.UploadService,
+	cartService *services.CartService,
 ) *Server {
 	return &Server{
 		config:         cfg,
@@ -36,6 +38,7 @@ func New(cfg *config.Config,
 		productService: productService,
 		userService:    userService,
 		uploadService:  uploadService,
+		cartService:    cartService,
 	}
 }
 
@@ -89,6 +92,15 @@ func (s *Server) SetupRoutes() *gin.Engine {
 				products.PUT("/:id", s.adminMiddleware(), s.updateProduct)
 				products.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
 				products.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
+			}
+
+			// Cart routes
+			cart := protected.Group("/cart")
+			{
+				cart.GET("", s.getCart)
+				cart.POST("/items", s.addToCart)
+				cart.PUT("/items/:itemId", s.updateCartItem)
+				cart.DELETE("/items/:itemId", s.removeCartItem)
 			}
 		}
 

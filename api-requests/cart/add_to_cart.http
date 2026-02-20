@@ -1,0 +1,10 @@
+### Add item to cart
+POST {{base_url}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "product_id": 1,
+  "quantity": 2
+}
+

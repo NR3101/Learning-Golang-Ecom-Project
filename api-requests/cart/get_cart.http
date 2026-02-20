@@ -1,0 +1,4 @@
+### Get user's cart
+GET {{base_url}}/cart
+Authorization: Bearer {{access_token}}
+

@@ -1,0 +1,9 @@
+### Update cart item quantity
+PUT {{base_url}}/cart/items/1
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "quantity": 5
+}
+
