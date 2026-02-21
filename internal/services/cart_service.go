@@ -45,11 +45,13 @@ func (s *CartService) AddToCart(userID uint, req *dto.AddToCartRequest) (*dto.Ca
 		return nil, err
 	}
 
-	// Check if the product is already in the cart
+	// Check if the product is already in the cart (including soft-deleted items)
 	var cartItem models.CartItem
-	if err := s.db.Where("cart_id = ? AND product_id = ?", cart.ID, req.ProductID).First(&cartItem).Error; err != nil {
-		// If product is not in the cart, create a new cart item
+	err := s.db.Unscoped().Where("cart_id = ? AND product_id = ?", cart.ID, req.ProductID).First(&cartItem).Error
+
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Product is not in the cart, create a new cart item
 			cartItem = models.CartItem{
 				CartID:    cart.ID,
 				ProductID: req.ProductID,
@@ -61,9 +63,15 @@ func (s *CartService) AddToCart(userID uint, req *dto.AddToCartRequest) (*dto.Ca
 		} else {
 			return nil, err
 		}
-	} else
-	// If product is already in the cart, update the quantity
-	{
+	} else if cartItem.DeletedAt.Valid {
+		// Item was soft-deleted, restore it with new quantity
+		cartItem.DeletedAt = gorm.DeletedAt{}
+		cartItem.Quantity = req.Quantity
+		if err := s.db.Unscoped().Save(&cartItem).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		// Product is already in the cart, update the quantity
 		cartItem.Quantity += req.Quantity
 		if err := s.db.Save(&cartItem).Error; err != nil {
 			return nil, err

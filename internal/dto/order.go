@@ -29,7 +29,7 @@ type OrderResponse struct {
 	Status      string              `json:"status"`
 	TotalAmount float64             `json:"total_amount"`
 	OrderItems  []OrderItemResponse `json:"items"`
-	CreatedAt   int64               `json:"created_at"`
+	CreatedAt   string              `json:"created_at"`
 }
 
 type OrderItemResponse struct {

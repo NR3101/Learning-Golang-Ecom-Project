@@ -1,0 +1,5 @@
+### Get all orders (paginated)
+GET {{base_url}}/orders/?page=1&limit=10
+Authorization: Bearer {{access_token}}
+
+

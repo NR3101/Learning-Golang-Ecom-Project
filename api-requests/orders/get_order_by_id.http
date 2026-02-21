@@ -1,0 +1,5 @@
+### Get order by ID
+GET {{base_url}}/orders/4
+Authorization: Bearer {{access_token}}
+
+
