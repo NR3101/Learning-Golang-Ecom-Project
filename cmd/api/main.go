@@ -20,6 +20,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title           E-commerce API
+// @version         1.0
+// @description     This is a sample server for an e-commerce application.
+// @termsOfService  http://swaager.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  no-email@enail.com
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+// @schemes http https
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description  Type "Bearer {token}" to authenticate requests
+
 func main() {
 	log := logger.New()
 	cfg, err := config.Load()

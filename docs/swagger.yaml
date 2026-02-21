@@ -1,0 +1,25 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact:
+    email: no-email@enail.com
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server for an e-commerce application.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swaager.io/terms/
+  title: E-commerce API
+  version: "1.0"
+paths: {}
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    description: Type "Bearer {token}" to authenticate requests
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

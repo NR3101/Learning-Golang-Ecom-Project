@@ -1,4 +1,4 @@
-.PHONY: help build run dev lint format migrate-up migrate-down docker-up docker-down
+.PHONY: help build run dev lint format generate-docs migrate-up migrate-down docker-up docker-down
 
 help:
 	@echo "Makefile commands:"
@@ -7,6 +7,7 @@ help:
 	@echo "  dev            - Run the application in development mode"
 	@echo "  lint           - Run linters on the codebase"
 	@echo "  format         - Format the codebase using gofmt and goimports"
+	@echo "  generate-docs  - Generate API documentation using swag"
 	@echo "  migrate-up     - Apply database migrations"
 	@echo "  migrate-down   - Rollback database migrations"
 	@echo "  docker-up      - Start the application dependency services using Docker"
@@ -28,6 +29,10 @@ lint: format
 format:
 	@gofmt -s -w .
 	@goimports -w .
+
+generate-docs:
+	mkdir -p docs
+	swag init -g cmd/api/main.go -o docs --parseDependency -parseInternal -parseDepth 1 --exclude .git,docs,docker,db
 
 migrate-up:
 	migrate -path db/migrations -database "postgres://postgres:password@localhost:5432/ecomdb?sslmode=disable" up

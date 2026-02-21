@@ -3,10 +3,14 @@ package server
 import (
 	"net/http"
 
+	_ "github.com/NR3101/go-ecom-project/docs"
 	"github.com/NR3101/go-ecom-project/internal/config"
 	"github.com/NR3101/go-ecom-project/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -56,6 +60,10 @@ func (s *Server) SetupRoutes() *gin.Engine {
 	// API routes
 	router.GET("/health", s.healthCheckHandler)
 	router.Static("/uploads", "./uploads")
+
+	// Swagger UI route
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.StaticFile("/api-docs", "./docs/rapidoc.html")
 
 	// Group API routes under /api/v1
 	api := router.Group("/api/v1")
