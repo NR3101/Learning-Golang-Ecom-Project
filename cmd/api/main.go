@@ -36,7 +36,7 @@ import (
 // @BasePath  /api/v1
 // @schemes http https
 
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
 // @description  Type "Bearer {token}" to authenticate requests

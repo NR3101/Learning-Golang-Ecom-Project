@@ -32,7 +32,7 @@ format:
 
 generate-docs:
 	mkdir -p docs
-	swag init -g cmd/api/main.go -o docs --parseDependency -parseInternal -parseDepth 1 --exclude .git,docs,docker,db
+	swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal --parseDepth 3 --exclude .git,docs,docker,db -d ./,./internal/server
 
 migrate-up:
 	migrate -path db/migrations -database "postgres://postgres:password@localhost:5432/ecomdb?sslmode=disable" up

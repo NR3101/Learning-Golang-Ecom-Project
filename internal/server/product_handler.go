@@ -12,7 +12,19 @@ import (
 
 /*--------------------- Category Handlers ---------------------*/
 
-// createCategory handles the HTTP request for creating a new product category.
+// @Summary Create a new category
+// @Description Create a new product category (Admin only)
+// @Tags Categories
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param createCategoryRequest body dto.CreateCategoryRequest true "Category creation data"
+// @Success 201 {object} utils.Response{data=dto.CategoryResponse} "Category created successfully"
+// @Failure 400 {object} utils.Response "Invalid request body"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 403 {object} utils.Response "Forbidden - Admin access required"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /categories [post]
 func (s *Server) createCategory(c *gin.Context) {
 	var req dto.CreateCategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -29,7 +41,14 @@ func (s *Server) createCategory(c *gin.Context) {
 	utils.CreatedResponse(c, "Category created successfully", category)
 }
 
-// getCategories handles the HTTP request for retrieving all active product categories.
+// @Summary Get all categories
+// @Description Retrieve all active product categories
+// @Tags Categories
+// @Accept json
+// @Produce json
+// @Success 200 {object} utils.Response{data=[]dto.CategoryResponse} "Categories retrieved successfully"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /categories [get]
 func (s *Server) getCategories(c *gin.Context) {
 	categories, err := s.productService.GetCategories()
 	if err != nil {
@@ -40,7 +59,20 @@ func (s *Server) getCategories(c *gin.Context) {
 	utils.SuccessResponse(c, "Categories retrieved successfully", categories)
 }
 
-// updateCategory handles the HTTP request for updating an existing product category.
+// @Summary Update a category
+// @Description Update an existing product category (Admin only)
+// @Tags Categories
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Category ID"
+// @Param updateCategoryRequest body dto.UpdateCategoryRequest true "Category update data"
+// @Success 200 {object} utils.Response{data=dto.CategoryResponse} "Category updated successfully"
+// @Failure 400 {object} utils.Response "Invalid request body or category ID"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 403 {object} utils.Response "Forbidden - Admin access required"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /categories/{id} [put]
 func (s *Server) updateCategory(c *gin.Context) {
 	var req dto.UpdateCategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -63,7 +95,20 @@ func (s *Server) updateCategory(c *gin.Context) {
 	utils.SuccessResponse(c, "Category updated successfully", category)
 }
 
-// deleteCategory handles the HTTP request for deleting a product category.
+// @Summary Delete a category
+// @Description Delete a product category (Admin only)
+// @Tags Categories
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Category ID"
+// @Success 200 {object} utils.Response "Category deleted successfully"
+// @Failure 400 {object} utils.Response "Invalid category ID"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 403 {object} utils.Response "Forbidden - Admin access required"
+// @Failure 404 {object} utils.Response "Category not found"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /categories/{id} [delete]
 func (s *Server) deleteCategory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -85,7 +130,19 @@ func (s *Server) deleteCategory(c *gin.Context) {
 
 /*--------------------- Product Handlers ---------------------*/
 
-// createProduct handles the HTTP request for creating a new product.
+// @Summary Create a new product
+// @Description Create a new product (Admin only)
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param createProductRequest body dto.CreateProductRequest true "Product creation data"
+// @Success 201 {object} utils.Response{data=dto.ProductResponse} "Product created successfully"
+// @Failure 400 {object} utils.Response "Invalid request body"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 403 {object} utils.Response "Forbidden - Admin access required"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /products [post]
 func (s *Server) createProduct(c *gin.Context) {
 	var req dto.CreateProductRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -102,7 +159,16 @@ func (s *Server) createProduct(c *gin.Context) {
 	utils.CreatedResponse(c, "Product created successfully", product)
 }
 
-// getProducts handles the HTTP request for retrieving all products with pagination and filtering.
+// @Summary Get all products
+// @Description Retrieve all products with pagination
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Number of items per page" default(10)
+// @Success 200 {object} utils.PaginatedResponse{data=[]dto.ProductResponse} "Products retrieved successfully"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /products [get]
 func (s *Server) getProducts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
@@ -116,7 +182,16 @@ func (s *Server) getProducts(c *gin.Context) {
 	utils.PaginatedSuccessResponse(c, "Products retrieved successfully", products, *meta)
 }
 
-// getProductByID handles the HTTP request for retrieving a single product by its ID.
+// @Summary Get a product by ID
+// @Description Retrieve a single product by its ID
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Param id path int true "Product ID"
+// @Success 200 {object} utils.Response{data=dto.ProductResponse} "Product retrieved successfully"
+// @Failure 400 {object} utils.Response "Invalid product ID"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /products/{id} [get]
 func (s *Server) getProductByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -133,7 +208,20 @@ func (s *Server) getProductByID(c *gin.Context) {
 	utils.SuccessResponse(c, "Product retrieved successfully", product)
 }
 
-// updateProduct handles the HTTP request for updating an existing product.
+// @Summary Update a product
+// @Description Update an existing product (Admin only)
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Product ID"
+// @Param updateProductRequest body dto.UpdateProductRequest true "Product update data"
+// @Success 200 {object} utils.Response{data=dto.ProductResponse} "Product updated successfully"
+// @Failure 400 {object} utils.Response "Invalid request body or product ID"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 403 {object} utils.Response "Forbidden - Admin access required"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /products/{id} [put]
 func (s *Server) updateProduct(c *gin.Context) {
 	var req dto.UpdateProductRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -156,7 +244,20 @@ func (s *Server) updateProduct(c *gin.Context) {
 	utils.SuccessResponse(c, "Product updated successfully", product)
 }
 
-// deleteProduct handles the HTTP request for deleting a product.
+// @Summary Delete a product
+// @Description Delete a product (Admin only)
+// @Tags Products
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Product ID"
+// @Success 200 {object} utils.Response "Product deleted successfully"
+// @Failure 400 {object} utils.Response "Invalid product ID"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 403 {object} utils.Response "Forbidden - Admin access required"
+// @Failure 404 {object} utils.Response "Product not found"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /products/{id} [delete]
 func (s *Server) deleteProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -176,6 +277,21 @@ func (s *Server) deleteProduct(c *gin.Context) {
 	utils.SuccessResponse(c, "Product deleted successfully", nil)
 }
 
+// @Summary Upload a product image
+// @Description Upload an image for a product (Admin only)
+// @Tags Products
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Product ID"
+// @Param image formData file true "Product image file"
+// @Success 201 {object} utils.Response "Product image uploaded successfully"
+// @Failure 400 {object} utils.Response "Invalid product ID or image file required"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 403 {object} utils.Response "Forbidden - Admin access required"
+// @Failure 404 {object} utils.Response "Product not found"
+// @Failure 500 {object} utils.Response "Internal server error"
+// @Router /products/{id}/images [post]
 func (s *Server) uploadProductImage(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
