@@ -7,6 +7,7 @@ import (
 
 	"github.com/NR3101/go-ecom-project/internal/config"
 	"github.com/NR3101/go-ecom-project/internal/dto"
+	"github.com/NR3101/go-ecom-project/internal/events"
 	"github.com/NR3101/go-ecom-project/internal/models"
 	"github.com/NR3101/go-ecom-project/internal/utils"
 	"gorm.io/gorm"
@@ -17,14 +18,16 @@ const (
 )
 
 type AuthService struct {
-	db     *gorm.DB
-	config *config.Config
+	db             *gorm.DB
+	config         *config.Config
+	eventPublisher events.Publisher
 }
 
-func NewAuthService(db *gorm.DB, config *config.Config) *AuthService {
+func NewAuthService(db *gorm.DB, config *config.Config, eventPublisher events.Publisher) *AuthService {
 	return &AuthService{
-		db:     db,
-		config: config,
+		db:             db,
+		config:         config,
+		eventPublisher: eventPublisher,
 	}
 }
 
@@ -155,6 +158,12 @@ func (s *AuthService) generateAuthResponse(user *models.User) (*dto.AuthResponse
 		Phone:     user.Phone,
 		Role:      string(user.Role),
 		IsActive:  user.IsActive,
+	}
+
+	err = s.eventPublisher.Publish("user_authenticated", userResponse, map[string]string{})
+	if err != nil {
+		slog.Error("Failed to publish user_authenticated event", "user_id", user.ID, "error", err)
+		return nil, err
 	}
 
 	return &dto.AuthResponse{

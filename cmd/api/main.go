@@ -12,6 +12,7 @@ import (
 
 	"github.com/NR3101/go-ecom-project/internal/config"
 	"github.com/NR3101/go-ecom-project/internal/database"
+	"github.com/NR3101/go-ecom-project/internal/events"
 	"github.com/NR3101/go-ecom-project/internal/interfaces"
 	"github.com/NR3101/go-ecom-project/internal/logger"
 	"github.com/NR3101/go-ecom-project/internal/providers"
@@ -60,8 +61,13 @@ func main() {
 	defer mainDB.Close()
 
 	gin.SetMode(cfg.Server.GinMode)
+	eventPublisher, err := events.NewEventPublisher(context.Background(), &cfg.Aws)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to initialize event publisher")
+	}
+	defer eventPublisher.Close()
 
-	authService := services.NewAuthService(db, cfg)
+	authService := services.NewAuthService(db, cfg, eventPublisher)
 	productService := services.NewProductService(db)
 	userService := services.NewUserService(db)
 	cartService := services.NewCartService(db)
