@@ -3,7 +3,7 @@ POST {{base_url}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "ram@123.com",
-  "password": "password123"
+  "email": "swaggeruser@test.com",
+  "password": "12345678"
 }
 
