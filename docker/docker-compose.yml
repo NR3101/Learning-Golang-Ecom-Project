@@ -53,6 +53,65 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
 
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - localstack
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=ecomdb
+      - DB_SSLMODE=disable
+      - AWS_S3_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_S3_BUCKET_NAME=ecom-uploads
+      - AWS_EVENT_QUEUE_NAME=ecom-events
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_FROM=noreply@shop.com
+      - JWT_SECRET=mysecretkey
+      - GIN_MODE=release
+      - UPLOAD_PROVIDER=local
+      - UPLOAD_PATH=./uploads
+    command: [ "./api" ]
+
+  notifier:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - postgres
+      - localstack
+      - mailpit
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=ecomdb
+      - DB_SSLMODE=disable
+      - AWS_S3_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_S3_BUCKET_NAME=ecom-uploads
+      - AWS_EVENT_QUEUE_NAME=ecom-events
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_FROM=noreply@shop.com
+    command: [ "./notifier" ]
+    deploy:
+      replicas: 1
+
 volumes:
   postgres_data:
   localstack_data:

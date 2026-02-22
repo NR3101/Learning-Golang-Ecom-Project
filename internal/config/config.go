@@ -14,6 +14,7 @@ type Config struct {
 	JWT      JWTConfig
 	Aws      AwsConfig
 	Upload   UploadConfig
+	SMTP     SMTPConfig
 }
 
 type ServerConfig struct {
@@ -45,6 +46,14 @@ type AwsConfig struct {
 	EventQueueName  string
 }
 
+type SMTPConfig struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+	From     string
+}
+
 type UploadConfig struct {
 	Path           string
 	MaxFileSize    int64
@@ -52,13 +61,13 @@ type UploadConfig struct {
 }
 
 func Load() (*Config, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, err
-	}
+	// Load .env file if it exists (ignore error if not present - e.g., in Docker)
+	_ = godotenv.Load()
 
 	jwtExpiresIn, _ := time.ParseDuration(getEnv("JWT_EXPIRES_IN", "24h"))                            // 24 hours
 	jwtRefreshTokenExpiresIn, _ := time.ParseDuration(getEnv("JWT_REFRESH_TOKEN_EXPIRES_IN", "168h")) // 7 days
 	maxUploadSize, _ := strconv.ParseInt(getEnv("MAX_UPLOAD_SIZE", "10485760"), 10, 64)               // 10 MB
+	smtpPort, _ := strconv.Atoi(getEnv("SMTP_PORT", "1025"))
 
 	config := &Config{
 		Server: ServerConfig{
@@ -90,6 +99,13 @@ func Load() (*Config, error) {
 			Path:           getEnv("UPLOAD_PATH", "./uploads"),
 			MaxFileSize:    maxUploadSize,                      // 10 MB
 			UploadProvider: getEnv("UPLOAD_PROVIDER", "local"), // "local" or "s3"
+		},
+		SMTP: SMTPConfig{
+			Host:     getEnv("SMTP_HOST", "localhost"),
+			Port:     smtpPort, // 1025 for local testing
+			Username: getEnv("SMTP_USERNAME", ""),
+			Password: getEnv("SMTP_PASSWORD", ""),
+			From:     getEnv("SMTP_FROM", "noreply@shop.com"),
 		},
 	}
 	return config, nil
