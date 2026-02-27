@@ -229,7 +229,17 @@ func (r *mutationResolver) RemoveFromCart(ctx context.Context, cartItemID string
 
 // CreateOrder is the resolver for the createOrder field.
 func (r *mutationResolver) CreateOrder(ctx context.Context) (*dto.OrderResponse, error) {
-	panic(fmt.Errorf("not implemented: CreateOrder - createOrder"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	res, err := r.orderService.CreateOrder(userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create order: %w", err)
+	}
+
+	return res, nil
 }
 
 // Me is the resolver for the me field.
@@ -249,14 +259,7 @@ func (r *queryResolver) Me(ctx context.Context) (*dto.UserResponse, error) {
 
 // Products is the resolver for the products field.
 func (r *queryResolver) Products(ctx context.Context, page *int, limit *int) (*model.ProductConnection, error) {
-	p := 1
-	l := 10
-	if page != nil {
-		p = *page
-	}
-	if limit != nil {
-		l = *limit
-	}
+	p, l := getPageAndLimit(page, limit)
 
 	products, meta, err := r.productService.GetProducts(p, l)
 	if err != nil {
@@ -328,12 +331,54 @@ func (r *queryResolver) Cart(ctx context.Context) (*dto.CartResponse, error) {
 
 // Orders is the resolver for the orders field.
 func (r *queryResolver) Orders(ctx context.Context, page *int, limit *int) (*model.OrderConnection, error) {
-	panic(fmt.Errorf("not implemented: Orders - orders"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	p, l := getPageAndLimit(page, limit)
+
+	orders, meta, err := r.orderService.GetAllOrders(userID, p, l)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch orders: %w", err)
+	}
+
+	edges := make([]*model.OrderEdge, len(orders))
+	for i, order := range orders {
+		edges[i] = &model.OrderEdge{
+			Node: &order,
+		}
+	}
+
+	return &model.OrderConnection{
+		Edges: edges,
+		PageInfo: &model.PageInfo{
+			Page:       meta.Page,
+			Limit:      meta.Limit,
+			Total:      int(meta.Total),
+			TotalPages: meta.TotalPages,
+		},
+	}, nil
 }
 
 // Order is the resolver for the order field.
 func (r *queryResolver) Order(ctx context.Context, id string) (*dto.OrderResponse, error) {
-	panic(fmt.Errorf("not implemented: Order - order"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	parsedOrderId, err := r.parseID(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid order ID: %w", err)
+	}
+
+	res, err := r.orderService.GetOrderByID(userID, parsedOrderId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch order: %w", err)
+	}
+
+	return res, nil
 }
 
 // Mutation returns graph.MutationResolver implementation.
@@ -345,14 +390,21 @@ func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mutationResolver) RemoveCartItem(ctx context.Context, cartItemID string) (*dto.CartResponse, error) {
-	panic(fmt.Errorf("not implemented: RemoveCartItem - removeCartItem"))
+// getPageAndLimit extracts page and limit from pointers, applying defaults and bounds
+func getPageAndLimit(page, limit *int) (int, int) {
+	p := 1
+	l := 10
+	if page != nil {
+		p = *page
+	}
+	if limit != nil {
+		l = *limit
+	}
+	if p <= 0 {
+		p = 1
+	}
+	if l <= 0 {
+		l = 10
+	}
+	return p, l
 }
-*/
