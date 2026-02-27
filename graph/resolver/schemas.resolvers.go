@@ -15,27 +15,57 @@ import (
 
 // Register is the resolver for the register field.
 func (r *mutationResolver) Register(ctx context.Context, input dto.RegisterRequest) (*dto.AuthResponse, error) {
-	panic(fmt.Errorf("not implemented: Register - register"))
+	res, err := r.authService.Register(&input)
+	if err != nil {
+		return nil, fmt.Errorf("registration failed: %w", err)
+	}
+
+	return res, nil
 }
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input dto.LoginRequest) (*dto.AuthResponse, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+	res, err := r.authService.Login(&input)
+	if err != nil {
+		return nil, fmt.Errorf("login failed: %w", err)
+	}
+
+	return res, nil
 }
 
 // RefreshToken is the resolver for the refreshToken field.
 func (r *mutationResolver) RefreshToken(ctx context.Context, input dto.RefreshTokenRequest) (*dto.AuthResponse, error) {
-	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
+	res, err := r.authService.RefreshToken(&input)
+	if err != nil {
+		return nil, fmt.Errorf("token refresh failed: %w", err)
+	}
+
+	return res, nil
 }
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context, input dto.RefreshTokenRequest) (bool, error) {
-	panic(fmt.Errorf("not implemented: Logout - logout"))
+	err := r.authService.Logout(input.RefreshToken)
+	if err != nil {
+		return false, fmt.Errorf("logout failed: %w", err)
+	}
+
+	return true, nil
 }
 
 // UpdateProfile is the resolver for the updateProfile field.
 func (r *mutationResolver) UpdateProfile(ctx context.Context, input dto.UpdateProfileRequest) (*dto.UserResponse, error) {
-	panic(fmt.Errorf("not implemented: UpdateProfile - updateProfile"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	res, err := r.userService.UpdateProfile(userID, &input)
+	if err != nil {
+		return nil, fmt.Errorf("profile update failed: %w", err)
+	}
+
+	return res, nil
 }
 
 // CreateCategory is the resolver for the createCategory field.
@@ -90,7 +120,17 @@ func (r *mutationResolver) CreateOrder(ctx context.Context) (*dto.OrderResponse,
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*dto.UserResponse, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	res, err := r.userService.GetProfile(userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch user profile: %w", err)
+	}
+
+	return res, nil
 }
 
 // Products is the resolver for the products field.
