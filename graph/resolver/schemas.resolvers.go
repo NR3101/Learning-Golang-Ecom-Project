@@ -174,17 +174,57 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, 
 
 // AddToCart is the resolver for the addToCart field.
 func (r *mutationResolver) AddToCart(ctx context.Context, input dto.AddToCartRequest) (*dto.CartResponse, error) {
-	panic(fmt.Errorf("not implemented: AddToCart - addToCart"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	res, err := r.cartService.AddToCart(userID, &input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add item to cart: %w", err)
+	}
+
+	return res, nil
 }
 
 // UpdateCartItem is the resolver for the updateCartItem field.
 func (r *mutationResolver) UpdateCartItem(ctx context.Context, cartItemID string, input dto.UpdateCartItemRequest) (*dto.CartResponse, error) {
-	panic(fmt.Errorf("not implemented: UpdateCartItem - updateCartItem"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	parseCartItemId, err := r.parseID(cartItemID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid cart item ID: %w", err)
+	}
+
+	res, err := r.cartService.UpdateCart(userID, parseCartItemId, &input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update cart item: %w", err)
+	}
+
+	return res, nil
 }
 
-// RemoveCartItem is the resolver for the removeCartItem field.
-func (r *mutationResolver) RemoveCartItem(ctx context.Context, cartItemID string) (*dto.CartResponse, error) {
-	panic(fmt.Errorf("not implemented: RemoveCartItem - removeCartItem"))
+// RemoveFromCart is the resolver for the removeFromCart field.
+func (r *mutationResolver) RemoveFromCart(ctx context.Context, cartItemID string) (bool, error) {
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return false, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	parseCartItemId, err := r.parseID(cartItemID)
+	if err != nil {
+		return false, fmt.Errorf("invalid cart item ID: %w", err)
+	}
+
+	err = r.cartService.RemoveFromCart(userID, parseCartItemId)
+	if err != nil {
+		return false, fmt.Errorf("failed to remove item from cart: %w", err)
+	}
+
+	return true, nil
 }
 
 // CreateOrder is the resolver for the createOrder field.
@@ -273,7 +313,17 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*dto.CategoryResponse
 
 // Cart is the resolver for the cart field.
 func (r *queryResolver) Cart(ctx context.Context) (*dto.CartResponse, error) {
-	panic(fmt.Errorf("not implemented: Cart - cart"))
+	userID, err := GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user ID from context: %w", err)
+	}
+
+	res, err := r.cartService.GetCart(userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch cart: %w", err)
+	}
+
+	return res, nil
 }
 
 // Orders is the resolver for the orders field.
@@ -294,3 +344,15 @@ func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *mutationResolver) RemoveCartItem(ctx context.Context, cartItemID string) (*dto.CartResponse, error) {
+	panic(fmt.Errorf("not implemented: RemoveCartItem - removeCartItem"))
+}
+*/

@@ -99,7 +99,7 @@ type ComplexityRoot struct {
 		Logout         func(childComplexity int, input dto.RefreshTokenRequest) int
 		RefreshToken   func(childComplexity int, input dto.RefreshTokenRequest) int
 		Register       func(childComplexity int, input dto.RegisterRequest) int
-		RemoveCartItem func(childComplexity int, cartItemID string) int
+		RemoveFromCart func(childComplexity int, cartItemID string) int
 		UpdateCartItem func(childComplexity int, cartItemID string, input dto.UpdateCartItemRequest) int
 		UpdateCategory func(childComplexity int, id string, input dto.UpdateCategoryRequest) int
 		UpdateProduct  func(childComplexity int, id string, input dto.UpdateProductRequest) int
@@ -223,7 +223,7 @@ type MutationResolver interface {
 	DeleteProduct(ctx context.Context, id string) (bool, error)
 	AddToCart(ctx context.Context, input dto.AddToCartRequest) (*dto.CartResponse, error)
 	UpdateCartItem(ctx context.Context, cartItemID string, input dto.UpdateCartItemRequest) (*dto.CartResponse, error)
-	RemoveCartItem(ctx context.Context, cartItemID string) (*dto.CartResponse, error)
+	RemoveFromCart(ctx context.Context, cartItemID string) (bool, error)
 	CreateOrder(ctx context.Context) (*dto.OrderResponse, error)
 }
 type OrderResolver interface {
@@ -529,17 +529,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.Register(childComplexity, args["input"].(dto.RegisterRequest)), true
 
-	case "Mutation.removeCartItem":
-		if e.complexity.Mutation.RemoveCartItem == nil {
+	case "Mutation.removeFromCart":
+		if e.complexity.Mutation.RemoveFromCart == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_removeCartItem_args(ctx, rawArgs)
+		args, err := ec.field_Mutation_removeFromCart_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RemoveCartItem(childComplexity, args["cart_item_id"].(string)), true
+		return e.complexity.Mutation.RemoveFromCart(childComplexity, args["cart_item_id"].(string)), true
 
 	case "Mutation.updateCartItem":
 		if e.complexity.Mutation.UpdateCartItem == nil {
@@ -1216,7 +1216,7 @@ func (ec *executionContext) field_Mutation_register_args(ctx context.Context, ra
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_removeCartItem_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Mutation_removeFromCart_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "cart_item_id", ec.unmarshalNID2string)
@@ -3162,8 +3162,8 @@ func (ec *executionContext) fieldContext_Mutation_updateCartItem(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_removeCartItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_removeCartItem(ctx, field)
+func (ec *executionContext) _Mutation_removeFromCart(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_removeFromCart(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3176,7 +3176,7 @@ func (ec *executionContext) _Mutation_removeCartItem(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveCartItem(rctx, fc.Args["cart_item_id"].(string))
+		return ec.resolvers.Mutation().RemoveFromCart(rctx, fc.Args["cart_item_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3188,33 +3188,19 @@ func (ec *executionContext) _Mutation_removeCartItem(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*dto.CartResponse)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNCart2ᚖgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐCartResponse(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_removeCartItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_removeFromCart(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Cart_id(ctx, field)
-			case "user_id":
-				return ec.fieldContext_Cart_user_id(ctx, field)
-			case "cart_items":
-				return ec.fieldContext_Cart_cart_items(ctx, field)
-			case "total":
-				return ec.fieldContext_Cart_total(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Cart_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Cart_updated_at(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Cart", field.Name)
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -3224,7 +3210,7 @@ func (ec *executionContext) fieldContext_Mutation_removeCartItem(ctx context.Con
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_removeCartItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_removeFromCart_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8980,9 +8966,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "removeCartItem":
+		case "removeFromCart":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_removeCartItem(ctx, field)
+				return ec._Mutation_removeFromCart(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

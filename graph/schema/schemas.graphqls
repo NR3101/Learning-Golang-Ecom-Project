@@ -32,7 +32,7 @@ type Mutation {
 
     addToCart(input: AddToCartInput!): Cart!
     updateCartItem(cart_item_id: ID!, input: UpdateCartItemInput!): Cart!
-    removeCartItem(cart_item_id: ID!): Cart!
+    removeFromCart(cart_item_id: ID!): Boolean!
 
     createOrder: Order!
 }
