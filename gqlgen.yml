@@ -60,5 +60,5 @@ models:
     model: github.com/NR3101/go-ecom-project/internal/dto.AddToCartRequest
   ID:
     model: github.com/99designs/gqlgen/graphql.String # Use the built-in ID type from gqlgen for the ID scalar
-  Uint:
+  UInt:
     model: github.com/99designs/gqlgen/graphql.Uint # Use the built-in Int type from gqlgen for the Uint scalar
