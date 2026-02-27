@@ -1,4 +1,4 @@
-.PHONY: help build run dev lint format generate-docs migrate-up migrate-down docker-up docker-down
+.PHONY: help build run dev lint format generate-docs generate-graph migrate-up migrate-down docker-up docker-down
 
 help:
 	@echo "Makefile commands:"
@@ -8,6 +8,7 @@ help:
 	@echo "  lint           - Run linters on the codebase"
 	@echo "  format         - Format the codebase using gofmt and goimports"
 	@echo "  generate-docs  - Generate API documentation using swag"
+	@echo "  generate-graph - Generate GraphQL schema and resolvers using gqlgen"
 	@echo "  migrate-up     - Apply database migrations"
 	@echo "  migrate-down   - Rollback database migrations"
 	@echo "  docker-up      - Start the application dependency services using Docker"
@@ -41,6 +42,10 @@ format:
 generate-docs:
 	mkdir -p docs
 	swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal --parseDepth 3 --exclude .git,docs,docker,db -d ./,./internal/server
+
+generate-graph:
+	@go get github.com/99designs/gqlgen@v0.17.78
+	@go run github.com/99designs/gqlgen generate -v
 
 migrate-up:
 	migrate -path db/migrations -database "postgres://postgres:password@localhost:5432/ecomdb?sslmode=disable" up

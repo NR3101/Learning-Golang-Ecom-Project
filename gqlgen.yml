@@ -1,0 +1,64 @@
+schema:
+  - graph/schema/*.graphqls # The location of your GraphQL schema files
+
+exec:
+  filename: graph/generated.go # The file where the generated code will be stored
+  package: graph # The package name for the generated code
+
+model:
+  filename: graph/model/models_gen.go # The file where the generated models will be stored
+  package: model # The package name for the generated models
+
+resolver:
+  layout: follow-schema # The layout for the resolver files, following the schema structure
+  dir: graph/resolver # The directory where the resolver files will be stored
+  package: resolver # The package name for the resolver files
+  filename_template: { name }.resolvers.go # The template for naming resolver files
+
+autobind:
+  - "github.com/NR3101/go-ecom-project/internal/dto" # Don't regenerate models for types in this package, but use them directly
+
+models:
+  User:
+    model: github.com/NR3101/go-ecom-project/internal/dto.UserResponse
+  AuthPayload:
+    model: github.com/NR3101/go-ecom-project/internal/dto.AuthResponse
+  Product:
+    model: github.com/NR3101/go-ecom-project/internal/dto.ProductResponse
+  Category:
+    model: github.com/NR3101/go-ecom-project/internal/dto.CategoryResponse
+  Cart:
+    model: github.com/NR3101/go-ecom-project/internal/dto.CartResponse
+  CartItem:
+    model: github.com/NR3101/go-ecom-project/internal/dto.CartItemResponse
+  Order:
+    model: github.com/NR3101/go-ecom-project/internal/dto.OrderResponse
+  OrderItem:
+    model: github.com/NR3101/go-ecom-project/internal/dto.OrderItemResponse
+  ProductImage:
+    model: github.com/NR3101/go-ecom-project/internal/dto.ProductImageResponse
+
+  RegisterInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.RegisterRequest
+  LoginInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.LoginRequest
+  RefreshTokenInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.RefreshTokenRequest
+  UpdateProfileInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.UpdateProfileRequest
+  CreateCategoryInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.CreateCategoryRequest
+  UpdateCategoryInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.UpdateCategoryRequest
+  UpdateCartItemInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.UpdateCartItemRequest
+  CreateProductInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.CreateProductRequest
+  UpdateProductInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.UpdateProductRequest
+  AddToCartInput:
+    model: github.com/NR3101/go-ecom-project/internal/dto.AddToCartRequest
+  ID:
+    model: github.com/99designs/gqlgen/graphql.String # Use the built-in ID type from gqlgen for the ID scalar
+  Uint:
+    model: github.com/99designs/gqlgen/graphql.Uint # Use the built-in Int type from gqlgen for the Uint scalar
