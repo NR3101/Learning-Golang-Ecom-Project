@@ -79,7 +79,7 @@ type Order {
     user_id: ID!
     status: String!
     total_amount: Float!
-    items: [OrderItem!]!
+    order_items: [OrderItem!]!
 
     created_at:  Time!
     updated_at: Time!

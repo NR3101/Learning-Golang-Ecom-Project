@@ -109,7 +109,7 @@ type ComplexityRoot struct {
 	Order struct {
 		CreatedAt   func(childComplexity int) int
 		ID          func(childComplexity int) int
-		Items       func(childComplexity int) int
+		OrderItems  func(childComplexity int) int
 		Status      func(childComplexity int) int
 		TotalAmount func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -230,7 +230,6 @@ type OrderResolver interface {
 	ID(ctx context.Context, obj *dto.OrderResponse) (string, error)
 	UserID(ctx context.Context, obj *dto.OrderResponse) (string, error)
 
-	Items(ctx context.Context, obj *dto.OrderResponse) ([]*dto.OrderItemResponse, error)
 	CreatedAt(ctx context.Context, obj *dto.OrderResponse) (*time.Time, error)
 	UpdatedAt(ctx context.Context, obj *dto.OrderResponse) (*time.Time, error)
 }
@@ -604,12 +603,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Order.ID(childComplexity), true
 
-	case "Order.items":
-		if e.complexity.Order.Items == nil {
+	case "Order.order_items":
+		if e.complexity.Order.OrderItems == nil {
 			break
 		}
 
-		return e.complexity.Order.Items(childComplexity), true
+		return e.complexity.Order.OrderItems(childComplexity), true
 
 	case "Order.status":
 		if e.complexity.Order.Status == nil {
@@ -3279,8 +3278,8 @@ func (ec *executionContext) fieldContext_Mutation_createOrder(_ context.Context,
 				return ec.fieldContext_Order_status(ctx, field)
 			case "total_amount":
 				return ec.fieldContext_Order_total_amount(ctx, field)
-			case "items":
-				return ec.fieldContext_Order_items(ctx, field)
+			case "order_items":
+				return ec.fieldContext_Order_order_items(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Order_created_at(ctx, field)
 			case "updated_at":
@@ -3468,8 +3467,8 @@ func (ec *executionContext) fieldContext_Order_total_amount(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Order_items(ctx context.Context, field graphql.CollectedField, obj *dto.OrderResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Order_items(ctx, field)
+func (ec *executionContext) _Order_order_items(ctx context.Context, field graphql.CollectedField, obj *dto.OrderResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Order_order_items(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3482,7 +3481,7 @@ func (ec *executionContext) _Order_items(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Order().Items(rctx, obj)
+		return obj.OrderItems, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3494,17 +3493,17 @@ func (ec *executionContext) _Order_items(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*dto.OrderItemResponse)
+	res := resTmp.([]dto.OrderItemResponse)
 	fc.Result = res
-	return ec.marshalNOrderItem2ᚕᚖgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponseᚄ(ctx, field.Selections, res)
+	return ec.marshalNOrderItem2ᚕgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponseᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Order_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Order_order_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Order",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -3759,8 +3758,8 @@ func (ec *executionContext) fieldContext_OrderEdge_node(_ context.Context, field
 				return ec.fieldContext_Order_status(ctx, field)
 			case "total_amount":
 				return ec.fieldContext_Order_total_amount(ctx, field)
-			case "items":
-				return ec.fieldContext_Order_items(ctx, field)
+			case "order_items":
+				return ec.fieldContext_Order_order_items(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Order_created_at(ctx, field)
 			case "updated_at":
@@ -5468,8 +5467,8 @@ func (ec *executionContext) fieldContext_Query_order(ctx context.Context, field 
 				return ec.fieldContext_Order_status(ctx, field)
 			case "total_amount":
 				return ec.fieldContext_Order_total_amount(ctx, field)
-			case "items":
-				return ec.fieldContext_Order_items(ctx, field)
+			case "order_items":
+				return ec.fieldContext_Order_order_items(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Order_created_at(ctx, field)
 			case "updated_at":
@@ -9111,42 +9110,11 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "items":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Order_items(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+		case "order_items":
+			out.Values[i] = ec._Order_order_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "created_at":
 			field := field
 
@@ -10846,7 +10814,11 @@ func (ec *executionContext) marshalNOrderEdge2ᚖgithubᚗcomᚋNR3101ᚋgoᚑec
 	return ec._OrderEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNOrderItem2ᚕᚖgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*dto.OrderItemResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNOrderItem2githubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponse(ctx context.Context, sel ast.SelectionSet, v dto.OrderItemResponse) graphql.Marshaler {
+	return ec._OrderItem(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOrderItem2ᚕgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []dto.OrderItemResponse) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10870,7 +10842,7 @@ func (ec *executionContext) marshalNOrderItem2ᚕᚖgithubᚗcomᚋNR3101ᚋgo�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNOrderItem2ᚖgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponse(ctx, sel, v[i])
+			ret[i] = ec.marshalNOrderItem2githubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10888,16 +10860,6 @@ func (ec *executionContext) marshalNOrderItem2ᚕᚖgithubᚗcomᚋNR3101ᚋgo�
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalNOrderItem2ᚖgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋinternalᚋdtoᚐOrderItemResponse(ctx context.Context, sel ast.SelectionSet, v *dto.OrderItemResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._OrderItem(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋNR3101ᚋgoᚑecomᚑprojectᚋgraphᚋmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *model.PageInfo) graphql.Marshaler {
