@@ -45,7 +45,7 @@ generate-docs:
 
 generate-graph:
 	@go get github.com/99designs/gqlgen@v0.17.78
-	@go run github.com/99designs/gqlgen generate -v
+	@go run github.com/99designs/gqlgen generate
 
 migrate-up:
 	migrate -path db/migrations -database "postgres://postgres:password@localhost:5432/ecomdb?sslmode=disable" up

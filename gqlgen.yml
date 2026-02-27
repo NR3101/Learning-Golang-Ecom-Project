@@ -13,7 +13,7 @@ resolver:
   layout: follow-schema # The layout for the resolver files, following the schema structure
   dir: graph/resolver # The directory where the resolver files will be stored
   package: resolver # The package name for the resolver files
-  filename_template: { name }.resolvers.go # The template for naming resolver files
+  filename_template: "{name}.resolvers.go" # The template for naming resolver files
 
 autobind:
   - "github.com/NR3101/go-ecom-project/internal/dto" # Don't regenerate models for types in this package, but use them directly
