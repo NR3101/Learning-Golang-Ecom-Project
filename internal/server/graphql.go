@@ -1,6 +1,8 @@
 package server
 
 import (
+	"context"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
@@ -63,5 +65,25 @@ func (s *Server) playgroundHandler() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		srv.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+// graphqlMiddleware is a Gin middleware function that extracts user information from the request context and adds it to the GraphQL request context, allowing resolvers to access user-specific data during query execution.
+func (s *Server) graphqlMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract user information from the Gin context, which may have been set by an authentication middleware.
+		userID, _ := c.Get("user_id")
+		userEmail, _ := c.Get("user_email")
+		userRole, _ := c.Get("user_role")
+
+		// Create a new context for the GraphQL request and add the user information to it.
+		ctx := context.WithValue(c.Request.Context(), "user_id", userID)
+		ctx = context.WithValue(ctx, "user_email", userEmail)
+		ctx = context.WithValue(ctx, "user_role", userRole)
+
+		// Update the request context with the new context containing user information.
+		c.Request = c.Request.WithContext(ctx)
+
+		c.Next()
 	}
 }
