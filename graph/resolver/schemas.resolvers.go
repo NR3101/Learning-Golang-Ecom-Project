@@ -389,22 +389,3 @@ func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// getPageAndLimit extracts page and limit from pointers, applying defaults and bounds
-func getPageAndLimit(page, limit *int) (int, int) {
-	p := 1
-	l := 10
-	if page != nil {
-		p = *page
-	}
-	if limit != nil {
-		l = *limit
-	}
-	if p <= 0 {
-		p = 1
-	}
-	if l <= 0 {
-		l = 10
-	}
-	return p, l
-}

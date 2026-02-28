@@ -7,7 +7,6 @@ package resolver
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/NR3101/go-ecom-project/graph"
 	"github.com/NR3101/go-ecom-project/internal/dto"
@@ -23,16 +22,6 @@ func (r *cartResolver) UserID(ctx context.Context, obj *dto.CartResponse) (strin
 	return fmt.Sprintf("%d", obj.UserID), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *cartResolver) CreatedAt(ctx context.Context, obj *dto.CartResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *cartResolver) UpdatedAt(ctx context.Context, obj *dto.CartResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
 // ID is the resolver for the id field.
 func (r *cartItemResolver) ID(ctx context.Context, obj *dto.CartItemResponse) (string, error) {
 	return fmt.Sprintf("%d", obj.ID), nil
@@ -43,16 +32,6 @@ func (r *categoryResolver) ID(ctx context.Context, obj *dto.CategoryResponse) (s
 	return fmt.Sprintf("%d", obj.ID), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *categoryResolver) CreatedAt(ctx context.Context, obj *dto.CategoryResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *categoryResolver) UpdatedAt(ctx context.Context, obj *dto.CategoryResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
 // ID is the resolver for the id field.
 func (r *orderResolver) ID(ctx context.Context, obj *dto.OrderResponse) (string, error) {
 	return fmt.Sprintf("%d", obj.ID), nil
@@ -61,16 +40,6 @@ func (r *orderResolver) ID(ctx context.Context, obj *dto.OrderResponse) (string,
 // UserID is the resolver for the user_id field.
 func (r *orderResolver) UserID(ctx context.Context, obj *dto.OrderResponse) (string, error) {
 	return fmt.Sprintf("%d", obj.UserID), nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *orderResolver) CreatedAt(ctx context.Context, obj *dto.OrderResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *orderResolver) UpdatedAt(ctx context.Context, obj *dto.OrderResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
 // ID is the resolver for the id field.
@@ -88,16 +57,6 @@ func (r *productResolver) CategoryID(ctx context.Context, obj *dto.ProductRespon
 	return fmt.Sprintf("%d", obj.CategoryID), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *productResolver) CreatedAt(ctx context.Context, obj *dto.ProductResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *productResolver) UpdatedAt(ctx context.Context, obj *dto.ProductResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
 // ID is the resolver for the id field.
 func (r *productImageResolver) ID(ctx context.Context, obj *dto.ProductImageResponse) (string, error) {
 	return fmt.Sprintf("%d", obj.ID), nil
@@ -106,16 +65,6 @@ func (r *productImageResolver) ID(ctx context.Context, obj *dto.ProductImageResp
 // ID is the resolver for the id field.
 func (r *userResolver) ID(ctx context.Context, obj *dto.UserResponse) (string, error) {
 	return fmt.Sprintf("%d", obj.ID), nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *userResolver) CreatedAt(ctx context.Context, obj *dto.UserResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *userResolver) UpdatedAt(ctx context.Context, obj *dto.UserResponse) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
 // Cart returns graph.CartResolver implementation.

@@ -49,3 +49,22 @@ func IsAdmin(ctx context.Context) bool {
 
 	return role == adminRole
 }
+
+// getPageAndLimit extracts page and limit from pointers, applying defaults and bounds
+func getPageAndLimit(page, limit *int) (int, int) {
+	p := 1
+	l := 10
+	if page != nil {
+		p = *page
+	}
+	if limit != nil {
+		l = *limit
+	}
+	if p <= 0 {
+		p = 1
+	}
+	if l <= 0 {
+		l = 10
+	}
+	return p, l
+}

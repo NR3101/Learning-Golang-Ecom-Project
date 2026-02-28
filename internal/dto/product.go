@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type CreateCategoryRequest struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
@@ -16,6 +18,9 @@ type CategoryResponse struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	IsActive    bool   `json:"is_active"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type CreateProductRequest struct {
@@ -47,6 +52,9 @@ type ProductResponse struct {
 	IsActive    bool                   `json:"is_active"`
 	Category    CategoryResponse       `json:"category"`
 	Images      []ProductImageResponse `json:"images"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type ProductImageResponse struct {
@@ -54,4 +62,6 @@ type ProductImageResponse struct {
 	URL       string `json:"url"`
 	AltText   string `json:"alt_text"`
 	IsPrimary bool   `json:"is_primary"`
+
+	CreatedAt time.Time `json:"created_at"`
 }
