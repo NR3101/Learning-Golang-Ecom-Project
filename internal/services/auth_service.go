@@ -17,6 +17,9 @@ const (
 	ErrEmailAlreadyExists = "email already exists"
 )
 
+// Ensure AuthService implements AuthServiceInterface at compile time.
+var _ AuthServiceInterface = (*AuthService)(nil)
+
 type AuthService struct {
 	db             *gorm.DB
 	config         *config.Config

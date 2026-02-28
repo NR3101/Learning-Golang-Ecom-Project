@@ -9,9 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	dateFormat = "2006-01-02T15:04:05Z"
-)
+var _ OrderServiceInterface = (*OrderService)(nil)
 
 type OrderService struct {
 	db *gorm.DB
