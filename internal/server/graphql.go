@@ -68,6 +68,24 @@ func (s *Server) playgroundHandler() gin.HandlerFunc {
 	}
 }
 
+// playgroundPublicHandler is playgroundHandler for public routes
+func (s *Server) playgroundPublicHandler() gin.HandlerFunc {
+	srv := playground.Handler("GraphQL Playground", "/graphql/public")
+
+	return func(c *gin.Context) {
+		srv.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+// playgroundProtectedHandler is playgroundHandler for protected routes
+func (s *Server) playgroundProtectedHandler() gin.HandlerFunc {
+	srv := playground.Handler("GraphQL Playground", "/graphql")
+
+	return func(c *gin.Context) {
+		srv.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
 // graphqlMiddleware is a Gin middleware function that extracts user information from the request context and adds it to the GraphQL request context, allowing resolvers to access user-specific data during query execution.
 func (s *Server) graphqlMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

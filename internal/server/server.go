@@ -67,6 +67,12 @@ func (s *Server) SetupRoutes() *gin.Engine {
 
 	// GraphQL routes
 	router.GET("/playground", s.playgroundHandler())
+	router.GET("/playground/public", s.playgroundPublicHandler())
+	router.GET("/playground/protected", s.playgroundProtectedHandler())
+
+	graphqlPublic := router.Group("/graphql/public")
+	graphqlPublic.Use(s.graphqlMiddleware())
+	graphqlPublic.POST("/", s.graphqlHandler())
 
 	graphqlProtected := router.Group("/graphql")
 	graphqlProtected.Use(s.authMiddleware())
