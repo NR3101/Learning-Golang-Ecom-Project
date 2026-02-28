@@ -65,6 +65,14 @@ func (s *Server) SetupRoutes() *gin.Engine {
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.StaticFile("/api-docs", "./docs/rapidoc.html")
 
+	// GraphQL routes
+	router.GET("/playground", s.playgroundHandler())
+
+	graphqlProtected := router.Group("/graphql")
+	graphqlProtected.Use(s.authMiddleware())
+	graphqlProtected.Use(s.graphqlMiddleware())
+	graphqlProtected.POST("/", s.graphqlHandler())
+
 	// Group API routes under /api/v1
 	api := router.Group("/api/v1")
 	{
