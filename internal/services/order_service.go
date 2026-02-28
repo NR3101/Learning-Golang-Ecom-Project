@@ -189,10 +189,15 @@ func (s *OrderService) convertToOrderResponse(order *models.Order) dto.OrderResp
 					Name:        item.Product.Category.Name,
 					Description: item.Product.Category.Description,
 					IsActive:    item.Product.IsActive,
+					CreatedAt:   item.Product.Category.CreatedAt,
+					UpdatedAt:   item.Product.Category.UpdatedAt,
 				},
+				CreatedAt: item.Product.CreatedAt,
+				UpdatedAt: item.Product.UpdatedAt,
 			},
-			Quantity: item.Quantity,
-			Price:    item.Price,
+			Quantity:  item.Quantity,
+			Price:     item.Price,
+			CreatedAt: item.CreatedAt,
 		}
 	}
 
@@ -202,6 +207,7 @@ func (s *OrderService) convertToOrderResponse(order *models.Order) dto.OrderResp
 		Status:      string(order.Status),
 		TotalAmount: order.TotalAmount,
 		OrderItems:  orderItems,
-		CreatedAt:   order.CreatedAt.Format(dateFormat),
+		CreatedAt:   order.CreatedAt,
+		UpdatedAt:   order.UpdatedAt,
 	}
 }

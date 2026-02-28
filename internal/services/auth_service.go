@@ -158,6 +158,8 @@ func (s *AuthService) generateAuthResponse(user *models.User) (*dto.AuthResponse
 		Phone:     user.Phone,
 		Role:      string(user.Role),
 		IsActive:  user.IsActive,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 	}
 
 	err = s.eventPublisher.Publish("user_authenticated", userResponse, map[string]string{})
