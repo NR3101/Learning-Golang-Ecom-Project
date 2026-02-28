@@ -3,6 +3,8 @@ package resolver
 import (
 	"context"
 	"errors"
+
+	"github.com/NR3101/go-ecom-project/internal/utils"
 )
 
 var (
@@ -14,7 +16,7 @@ const (
 )
 
 func GetUserIDFromContext(ctx context.Context) (uint, error) {
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(utils.UserID)
 	if userID == nil {
 		return 0, ErrUnauthorized
 	}
@@ -28,7 +30,7 @@ func GetUserIDFromContext(ctx context.Context) (uint, error) {
 }
 
 func GetUserRoleFromContext(ctx context.Context) (string, error) {
-	userRole := ctx.Value("user_role")
+	userRole := ctx.Value(utils.UserRole)
 	if userRole == nil {
 		return "", ErrUnauthorized
 	}

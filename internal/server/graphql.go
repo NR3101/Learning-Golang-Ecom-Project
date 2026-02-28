@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/NR3101/go-ecom-project/graph"
 	"github.com/NR3101/go-ecom-project/graph/resolver"
+	"github.com/NR3101/go-ecom-project/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -95,9 +96,10 @@ func (s *Server) graphqlMiddleware() gin.HandlerFunc {
 		userRole, _ := c.Get("user_role")
 
 		// Create a new context for the GraphQL request and add the user information to it.
-		ctx := context.WithValue(c.Request.Context(), "user_id", userID)
-		ctx = context.WithValue(ctx, "user_email", userEmail)
-		ctx = context.WithValue(ctx, "user_role", userRole)
+		ctx := context.WithValue(c.Request.Context(), utils.UserID, userID)
+		ctx = context.WithValue(ctx, utils.UserEmail, userEmail)
+		ctx = context.WithValue(ctx, utils.UserRole, userRole)
+		ctx = context.WithValue(ctx, utils.GinContext, c)
 
 		// Update the request context with the new context containing user information.
 		c.Request = c.Request.WithContext(ctx)

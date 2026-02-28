@@ -11,12 +11,10 @@ import (
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"gorm.io/gorm"
 )
 
 type Server struct {
 	config         *config.Config
-	db             *gorm.DB
 	logger         *zerolog.Logger
 	authService    *services.AuthService
 	productService *services.ProductService
@@ -27,7 +25,6 @@ type Server struct {
 }
 
 func New(cfg *config.Config,
-	db *gorm.DB,
 	logger *zerolog.Logger,
 	authService *services.AuthService,
 	productService *services.ProductService,
@@ -38,7 +35,6 @@ func New(cfg *config.Config,
 ) *Server {
 	return &Server{
 		config:         cfg,
-		db:             db,
 		logger:         logger,
 		authService:    authService,
 		productService: productService,
