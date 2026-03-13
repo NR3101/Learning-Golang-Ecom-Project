@@ -4,7 +4,7 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "product_id": 1,
+  "product_id": 21,
   "quantity": 2
 }
 

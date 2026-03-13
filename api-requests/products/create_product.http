@@ -4,12 +4,12 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "category_id": 4,
-  "name": "iPhone 15 Pro",
+  "category_id": 11,
+  "name": "iPhone 17 Pro",
   "description": "Latest Apple smartphone with A17 Pro chip",
   "price": 999.99,
   "stock": 100,
-  "sku": "IPHONE-15-PRO-001"
+  "sku": "IPHONE-17-PRO-001"
 }
 
 

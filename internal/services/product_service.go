@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/NR3101/go-ecom-project/internal/dto"
 	"github.com/NR3101/go-ecom-project/internal/models"
 	"github.com/NR3101/go-ecom-project/internal/utils"
@@ -98,6 +100,11 @@ func (s *ProductService) DeleteCategory(id uint) error {
 
 // CreateProduct creates a new product in the database.
 func (s *ProductService) CreateProduct(req *dto.CreateProductRequest) (*dto.ProductResponse, error) {
+	var category models.Category
+	if err := s.db.First(&category, req.CategoryID).Error; err != nil {
+		return nil, errors.New("category not found")
+	}
+
 	product := &models.Product{
 		CategoryID:  req.CategoryID,
 		Name:        req.Name,

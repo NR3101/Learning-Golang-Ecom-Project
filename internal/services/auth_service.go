@@ -43,8 +43,7 @@ func NewAuthService(
 // Register creates a new user account and returns an authentication response with tokens.
 func (s *AuthService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, error) {
 	// Check if email already exists
-	var existingUser models.User
-	if err := s.db.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
+	if _, err := s.userRepo.GetByEmail(req.Email); err == nil {
 		return nil, errors.New(ErrEmailAlreadyExists)
 	}
 
@@ -63,7 +62,7 @@ func (s *AuthService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, err
 		Phone:     req.Phone,
 		Role:      models.UserRoleCustomer,
 	}
-	if err := s.db.Create(&user).Error; err != nil {
+	if err := s.userRepo.Create(&user); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +70,7 @@ func (s *AuthService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, err
 	cart := models.Cart{
 		UserID: user.ID,
 	}
-	if err := s.db.Create(&cart).Error; err != nil {
+	if err := s.cartRepo.Create(&cart); err != nil {
 		slog.Error("Failed to create cart for user", "user_id", user.ID, "error", err)
 	}
 
@@ -82,8 +81,8 @@ func (s *AuthService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, err
 // Login authenticates a user and returns an authentication response with tokens.
 func (s *AuthService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 	// Find user by email
-	var user models.User
-	if err := s.db.Where("email = ? AND is_Active = ?", req.Email, true).First(&user).Error; err != nil {
+	user, err := s.userRepo.GetByEmailAndIsActive(req.Email, true)
+	if err != nil {
 		return nil, errors.New("invalid credentials")
 	}
 
@@ -93,7 +92,7 @@ func (s *AuthService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 	}
 
 	// Generate tokens and return response
-	return s.generateAuthResponse(&user)
+	return s.generateAuthResponse(user)
 }
 
 // RefreshToken validates the provided refresh token, and if valid, generates new access and refresh tokens.
@@ -105,35 +104,29 @@ func (s *AuthService) RefreshToken(req *dto.RefreshTokenRequest) (*dto.AuthRespo
 	}
 
 	// Find if refresh token exists in DB and is not expired
-	var refreshToken models.RefreshToken
-	if err := s.db.Where("token = ? AND expires_at > ?", req.RefreshToken, time.Now()).First(&refreshToken).Error; err != nil {
+	refreshToken, err := s.userRepo.GetValidRefreshToken(req.RefreshToken)
+	if err != nil {
 		return nil, errors.New("refresh token not found or expired")
 	}
 
 	// Find user
-	var user models.User
-	if err := s.db.Where("id = ?", claims.UserID).First(&user).Error; err != nil {
+	user, err := s.userRepo.GetByID(claims.UserID)
+	if err != nil {
 		return nil, errors.New("user not found")
 	}
 
 	// Delete old refresh token
-	s.db.Delete(&refreshToken)
+	if err := s.userRepo.DeleteRefreshTokenByID(refreshToken.ID); err != nil {
+		slog.Error("Failed to delete old refresh token", "token_id", refreshToken.ID, "error", err)
+	}
 
 	// Generate new tokens and return response
-	return s.generateAuthResponse(&user)
+	return s.generateAuthResponse(user)
 }
 
 // Logout invalidates the provided refresh token by deleting it from the database.
 func (s *AuthService) Logout(refreshToken string) error {
-	// Delete refresh token from DB
-	result := s.db.Where("token = ?", refreshToken).Delete(&models.RefreshToken{})
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return errors.New("refresh token not found or already logged out")
-	}
-	return nil
+	return s.userRepo.DeleteRefreshToken(refreshToken)
 }
 
 // generateAuthResponse is a helper function that generates access and refresh tokens for a user.
@@ -154,8 +147,8 @@ func (s *AuthService) generateAuthResponse(user *models.User) (*dto.AuthResponse
 		Token:     refreshToken,
 		ExpiresAt: time.Now().Add(s.config.JWT.RefreshTokenExpiresIn),
 	}
-	if err := s.db.Create(&refreshTokenRecord).Error; err != nil {
-		return nil, err
+	if err := s.userRepo.CreateRefreshToken(&refreshTokenRecord); err != nil {
+		slog.Error("Failed to save refresh token", "user_id", user.ID, "error", err)
 	}
 
 	// Prepare response

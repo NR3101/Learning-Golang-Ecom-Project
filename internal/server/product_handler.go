@@ -152,6 +152,10 @@ func (s *Server) createProduct(c *gin.Context) {
 
 	product, err := s.productService.CreateProduct(&req)
 	if err != nil {
+		if err.Error() == "category not found" {
+			utils.BadRequestResponse(c, err.Error(), nil)
+			return
+		}
 		utils.InternalServerErrorResponse(c, "Failed to create product", err)
 		return
 	}
