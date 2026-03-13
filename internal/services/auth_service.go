@@ -9,8 +9,8 @@ import (
 	"github.com/NR3101/go-ecom-project/internal/dto"
 	"github.com/NR3101/go-ecom-project/internal/events"
 	"github.com/NR3101/go-ecom-project/internal/models"
+	"github.com/NR3101/go-ecom-project/internal/repositories"
 	"github.com/NR3101/go-ecom-project/internal/utils"
-	"gorm.io/gorm"
 )
 
 const (
@@ -21,14 +21,20 @@ const (
 var _ AuthServiceInterface = (*AuthService)(nil)
 
 type AuthService struct {
-	db             *gorm.DB
+	userRepo       repositories.UserRepositoryInterface
+	cartRepo       repositories.CartRepositoryInterface
 	config         *config.Config
 	eventPublisher events.Publisher
 }
 
-func NewAuthService(db *gorm.DB, config *config.Config, eventPublisher events.Publisher) *AuthService {
+func NewAuthService(
+	userRepo repositories.UserRepositoryInterface,
+	cartRepo repositories.CartRepositoryInterface,
+	config *config.Config,
+	eventPublisher events.Publisher) *AuthService {
 	return &AuthService{
-		db:             db,
+		userRepo:       userRepo,
+		cartRepo:       cartRepo,
 		config:         config,
 		eventPublisher: eventPublisher,
 	}

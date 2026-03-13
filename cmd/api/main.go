@@ -16,6 +16,7 @@ import (
 	"github.com/NR3101/go-ecom-project/internal/interfaces"
 	"github.com/NR3101/go-ecom-project/internal/logger"
 	"github.com/NR3101/go-ecom-project/internal/providers"
+	"github.com/NR3101/go-ecom-project/internal/repositories"
 	"github.com/NR3101/go-ecom-project/internal/server"
 	"github.com/NR3101/go-ecom-project/internal/services"
 	"github.com/gin-gonic/gin"
@@ -67,7 +68,10 @@ func main() {
 	}
 	defer eventPublisher.Close()
 
-	authService := services.NewAuthService(db, cfg, eventPublisher)
+	userRepo := repositories.NewUserRepository(db)
+	cartRepo := repositories.NewCartRepository(db)
+
+	authService := services.NewAuthService(userRepo, cartRepo, cfg, eventPublisher)
 	productService := services.NewProductService(db)
 	userService := services.NewUserService(db)
 	cartService := services.NewCartService(db)
