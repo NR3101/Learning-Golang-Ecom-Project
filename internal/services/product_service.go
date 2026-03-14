@@ -222,6 +222,77 @@ func (s *ProductService) AddProductImage(productId uint, imageUrl, altText strin
 	return s.db.Create(&image).Error
 }
 
+func (s *ProductService) SearchProducts(req *dto.SearchProductsRequest) ([]dto.ProductSearchResponse, *utils.PaginationMeta, error) {
+	if req.Page < 1 {
+		req.Page = 1
+	}
+	if req.Limit < 1 {
+		req.Limit = 10
+	}
+
+	offset := (req.Page - 1) * req.Limit
+
+	// Base query for full-text vector search
+	query := s.db.Model(&models.Product{}).
+		Select("products.*, ts_rank(search_vector, plainto_tsquery('english',?)) as rank", req.Query).
+		Where("search_vector @@ plainto_tsquery('english', ?)", req.Query).
+		Where("is_active = ?", true)
+
+	// Add other fields to query that are provided
+	if req.CategoryID != nil {
+		query = query.Where("category_id = ?", req.CategoryID)
+	}
+
+	if req.MaxPrice != nil {
+		query = query.Where("price <= ?", *req.MaxPrice)
+	}
+
+	if req.MinPrice != nil {
+		query = query.Where("price >= ?", *req.MinPrice)
+	}
+
+	// Count total results
+	var total int64
+	query.Count(&total)
+
+	// Execute query with ranking
+	type productsWithRank struct {
+		models.Product
+		Rank float32 `gorm:"column:rank"`
+	}
+
+	var rows []productsWithRank
+	if err := query.
+		Order("rank DESC, created_at DESC").
+		Preload("Category").
+		Preload("Images").
+		Limit(req.Limit).
+		Offset(offset).
+		Find(&rows).Error; err != nil {
+		return nil, nil, err
+	}
+
+	// Build response
+	responses := make([]dto.ProductSearchResponse, len(rows))
+	for i := range rows {
+		responses[i] = dto.ProductSearchResponse{
+			ProductResponse: s.convertToProductResponse(&rows[i].Product),
+			Rank:            rows[i].Rank,
+		}
+	}
+
+	// Build pagination meta
+	totalPages := int((total + int64(req.Limit) - 1) / int64(req.Limit))
+	meta := &utils.PaginationMeta{
+		Total:      total,
+		Page:       req.Page,
+		Limit:      req.Limit,
+		TotalPages: totalPages,
+	}
+
+	return responses, meta, nil
+}
+
 // convertToProductResponse is a helper method that converts a Product model to a ProductResponse DTO, including its category and images.
 func (s *ProductService) convertToProductResponse(product *models.Product) dto.ProductResponse {
 	images := make([]dto.ProductImageResponse, len(product.Images))

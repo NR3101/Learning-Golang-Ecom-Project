@@ -89,9 +89,13 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     depends_on:
-      - postgres
-      - localstack
-      - mailpit
+      postgres:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    restart: on-failure
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
